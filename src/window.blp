@@ -1,0 +1,82 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $ScreencastWindow: Adw.ApplicationWindow {
+  title: _("ScreenCast");
+  default-width: 800;
+  default-height: 600;
+
+  content: Adw.ToolbarView {
+    [top]
+    Adw.HeaderBar {
+      [end]
+      MenuButton {
+        primary: true;
+        icon-name: "open-menu-symbolic";
+        tooltip-text: _("Main Menu");
+        menu-model: primary_menu;
+      }
+    }
+
+    content: Box {
+      orientation: vertical;
+      halign: center;
+      valign: center;
+
+      Label {
+        label: _("Screen Cast");
+
+        styles [
+          "title-1",
+        ]
+      }
+
+      Label {
+        label: _("An app that help you cast your screen to other devices");
+        margin-top: 8;
+      }
+
+      Button btn_start {
+        label: _("Start");
+        margin-top: 8;
+        clicked => $on_btn_start_clicked();
+
+        styles [
+          "suggested-action",
+        ]
+      }
+
+      Button btn_stop {
+        label: _("Stop");
+        margin-top: 8;
+        clicked => $on_btn_stop_clicked();
+
+        styles [
+          "destructive-action",
+        ]
+      }
+
+
+    };
+  };
+}
+
+menu primary_menu {
+  section {
+    item {
+      label: _("_Preferences");
+      action: "app.preferences";
+    }
+
+    item {
+      label: _("_Keyboard Shortcuts");
+      action: "win.show-help-overlay";
+    }
+
+    item {
+      label: _("_About ScreenCast");
+      action: "app.about";
+    }
+  }
+}
+

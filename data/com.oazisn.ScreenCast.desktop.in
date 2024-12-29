@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=screencast
+Exec=screencast
+Icon=com.oazisn.ScreenCast
+Terminal=false
+Type=Application
+Categories=Utility;
+Keywords=GTK;
+StartupNotify=true
+DBusActivatable=true

@@ -1,0 +1,8 @@
+# List of source files containing translatable strings.
+# Please keep this file sorted alphabetically.
+data/com.oazisn.ScreenCast.desktop.in
+data/com.oazisn.ScreenCast.metainfo.xml.in
+data/com.oazisn.ScreenCast.gschema.xml
+src/main.vala
+src/window.vala
+src/window.ui
