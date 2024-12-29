@@ -1,62 +1,149 @@
 {
-    "id" : "com.oazisn.ScreenCast",
-    "runtime" : "org.gnome.Platform",
-    "runtime-version" : "47",
-    "sdk" : "org.gnome.Sdk",
-    "sdk-extensions" : [
-	"org.freedesktop.Sdk.Extension.vala"
-    ],
-    "command" : "screencast",
-    "finish-args" : [
-	"--share=network",
-	"--share=ipc",
-	"--socket=fallback-x11",
-	"--device=dri",
-	"--socket=wayland"
-    ],
-    "build-options" : {
-	"append-path" : "/usr/lib/sdk/vala/bin",
-	"prepend-ld-library-path" : "/usr/lib/sdk/vala/lib"
+  "id": "com.oazisn.ScreenCast",
+  "runtime": "org.gnome.Platform",
+  "runtime-version": "47",
+  "sdk": "org.gnome.Sdk",
+  "sdk-extensions": [
+    "org.freedesktop.Sdk.Extension.vala"
+  ],
+  "command": "screencast",
+  "finish-args": [
+    "--share=network",
+    "--share=ipc",
+    "--socket=fallback-x11",
+    "--device=dri",
+    "--socket=wayland"
+  ],
+  "build-options": {
+    "append-path": "/usr/lib/sdk/vala/bin",
+    "prepend-ld-library-path": "/usr/lib/sdk/vala/lib"
+  },
+  "cleanup": [
+    "/include",
+    "/lib/pkgconfig",
+    "/man",
+    "/share/doc",
+    "/share/gtk-doc",
+    "/share/man",
+    "/share/pkgconfig",
+    "/share/vala",
+    "*.la",
+    "*.a"
+  ],
+  "modules": [
+    {
+      "name": "x264",
+      "buildsystem": "simple",
+      "build-commands": [
+        "./configure --prefix=/app --disable-cli --enable-shared",
+        "make -j$(nproc)",
+        "make install"
+      ],
+      "sources": [
+        {
+          "type": "git",
+          "url": "https://code.videolan.org/videolan/x264.git",
+          "branch": "stable"
+        }
+      ]
     },
-    "cleanup" : [
-	"/include",
-	"/lib/pkgconfig",
-	"/man",
-	"/share/doc",
-	"/share/gtk-doc",
-	"/share/man",
-	"/share/pkgconfig",
-	"/share/vala",
-	"*.la",
-	"*.a"
-    ],
-    "modules" : [
-    	{
-	    "name" : "libportal",
-	    "buildsystem" : "meson",
-	    "builddir" : true,
-	    "config-opts" : [
-		"-Dbackend-gtk4=enabled",
-		"-Ddocs=false"
-	    ],
-	    "sources" : [
-		{
-		    "type" : "git",
-		    "url" : "https://github.com/flatpak/libportal.git",
-		    "branch" : "main"
-		}
-	    ]
-	},
-	{
-	    "name" : "screencast",
-	    "builddir" : true,
-	    "buildsystem" : "meson",
-	    "sources" : [
-		{
-		    "type" : "git",
-		    "url" : "file:///home/oazisn/Projects"
-		}
-	    ]
-	}
-    ]
+    {
+      "name": "x265",
+      "buildsystem": "simple",
+      "config-opts": [
+        "-DENABLE_SHARED=ON",
+        "-DENABLE_STATIC=OFF",
+        "-DENABLE_CLI=ON",
+        "-DENABLE_ASSEMBLY=ON",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_INSTALL_PREFIX=/app"
+      ],
+      "builddir": true,
+      "build-commands": [
+        "cmake -B builddir -S source -DCMAKE_BUILD_TYPE=Release -DENABLE_SHARED=ON -DENABLE_STATIC=OFF -DENABLE_CLI=ON -DENABLE_ASSEMBLY=ON -DCMAKE_INSTALL_PREFIX=/app",
+        "cmake --build builddir --target install -- -j$(nproc)"
+      ],
+      "sources": [
+        {
+          "type": "git",
+          "url": "https://bitbucket.org/multicoreware/x265_git.git",
+          "tag": "4.1"
+        }
+      ]
+    },
+    {
+      "name": "gstreamer",
+      "buildsystem": "meson",
+      "config-opts": [
+        "--buildtype=release",
+        "--wrap-mode=nodownload",
+        "--libdir=lib",
+
+        "-Dgpl=enabled",
+        "-Dbase=enabled",
+        "-Dgood=enabled",
+        "-Dbad=enabled",
+        "-Dugly=enabled",
+        "-Dvaapi=enabled",
+        "-Dgst-examples=disabled",
+        "-Dqt5=disabled",
+        "-Dtests=disabled",
+        "-Dexamples=disabled",
+        "-Dintrospection=disabled",
+        "-Ddoc=disabled",
+        "-Dgtk_doc=disabled",
+
+        "-Dgst-plugins-base:orc=enabled",
+
+        "-Dgst-plugins-bad:aom=disabled",
+        "-Dgst-plugins-bad:v4l2codecs=enabled",
+        "-Dgst-plugins-bad:va=enabled",
+        "-Dgst-plugins-bad:x265=enabled",
+        "-Dgst-plugins-ugly:x264=enabled"
+      ],
+      "sources": [
+        {
+          "type": "git",
+          "url": "https://gitlab.freedesktop.org/gstreamer/gstreamer.git",
+          "tag": "1.24.10",
+          "disable-submodules": true
+        }
+      ],
+      "cleanup": [
+        "/include",
+        "/lib/*.la",
+        "/lib/gstreamer-1.0/*.la",
+        "/lib/gstreamer-1.0/include",
+        "/lib/pkgconfig",
+        "/share/gtk-doc"
+      ]
+    },
+    {
+      "name": "libportal",
+      "buildsystem": "meson",
+      "builddir": true,
+      "config-opts": [
+        "-Dbackend-gtk4=enabled",
+        "-Ddocs=true"
+      ],
+      "sources": [
+        {
+          "type": "git",
+          "url": "https://github.com/flatpak/libportal.git",
+          "branch": "main"
+        }
+      ]
+    },
+    {
+      "name": "screencast",
+      "builddir": true,
+      "buildsystem": "meson",
+      "sources": [
+        {
+          "type": "git",
+          "url": "file:///home/oazisn/Projects"
+        }
+      ]
+    }
+  ]
 }
